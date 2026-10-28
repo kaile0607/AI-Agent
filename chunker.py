@@ -31,15 +31,15 @@ def find_code_files(root):
             if d not in SKIP_DIRS:
                 allowed_dirs.append(d)
 
-    dirs[:] = allowed_dirs
+        dirs[:] = allowed_dirs
 
     # Build the path 
-    for name in filenames:
-        if name in SKIP_FILES:
-            continue
-        path = Path(folder) / name
-        if path.suffix.lower() in CODE_EXTENSIONS:
-            files.append(path)
+        for name in filenames:
+            if name in SKIP_FILES:
+                continue
+            path = Path(folder) / name
+            if path.suffix.lower() in CODE_EXTENSIONS:
+                files.append(path)
 
     return files
 
