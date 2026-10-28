@@ -44,5 +44,39 @@ def find_code_files(root):
     return files
 
 
+def chunk_file(path, root, chunk_size=40, overlap=8):
+    """Split one file into overlapping chunks of lines"""
 
+    try:
+        text = Path(path).read_text(encoding="utf-8")
+    except (UnicodeDecodeError, OSError):
+        return [] # Unreadable or not really text: skip it
+
+    lines = text.splitlines()
+    step = chunk_size - overlap # How far we move forward each time
+    chunks = []
+
+    for start in range(0, len(lines), step):
+        piece = lines[start:start + chunk_size]
+        if not "".join(piece).strip():
+            continue # Skip chunks that are blank lines
+        chunks.append({
+            "file": Path(path).relative_to(root).as_posix(),
+            "start_line": start + 1,
+            "end_line": start + len(piece),
+            "text": "\n".join(piece),
+        })
+        if start + chunk_size >= len(lines):
+            break # Chunk reached end of file
+
+    return chunks
+
+def chunk_repo(root):
+    """Find every code file under root and return all their chunks"""
+    root = Path(root)
+    all_chunks = []
+    for path in find_code_files(root):
+        all_chunks.extend(chunk_file(path, root))
+
+    return all_chunks
             
